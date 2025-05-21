@@ -26,13 +26,13 @@ export async function execute(interaction) {
   if (!role) {
     return interaction.reply({ content: 'El rol seleccionado no existe.', ephemeral: true });
   }
-
-  // Prevenir duplicados de nivel
+  // Prevenir duplicados de nivel (solo si ya existe un rol con ese nivel en este guild)
   const existing = await LevelRole.findOne({ guildId, minLevel });
   if (existing && existing.roleId !== role.id) {
     return interaction.reply({ content: `Ya existe un rol asignado al nivel ${minLevel}: <@&${existing.roleId}>. Elimina o cambia ese rol primero.`, ephemeral: true });
   }
-
+  // Prevenir que dos roles tengan el mismo minLevel
+  await LevelRole.updateMany({ guildId, minLevel }, { $unset: { minLevel: 1 } });
   // Crear o actualizar la relación
   await LevelRole.findOneAndUpdate(
     { guildId, roleId: role.id },
