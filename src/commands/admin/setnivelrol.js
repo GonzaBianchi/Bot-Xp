@@ -5,7 +5,7 @@ import { LevelRole } from '../../utils/roleManager.js';
 export const data = new SlashCommandBuilder()
   .setName('setnivelrol')
   .setDescription('Asigna el nivel mínimo a un rol de nivel (solo administradores)')
-  .addRoleOption(option =>
+  .addStringOption(option =>
     option.setName('rol')
       .setDescription('Rol de nivel a configurar')
       .setRequired(true)
@@ -19,9 +19,13 @@ export const data = new SlashCommandBuilder()
   .setDefaultMemberPermissions(PermissionFlagsBits.Administrator);
 
 export async function execute(interaction) {
-  const role = interaction.options.getRole('rol');
+  const roleId = interaction.options.getString('rol');
   const minLevel = interaction.options.getInteger('nivel');
   const guildId = interaction.guild.id;
+  const role = interaction.guild.roles.cache.get(roleId);
+  if (!role) {
+    return interaction.reply({ content: 'El rol seleccionado no existe.', ephemeral: true });
+  }
 
   // Prevenir duplicados de nivel
   const existing = await LevelRole.findOne({ guildId, minLevel });
