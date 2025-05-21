@@ -8,7 +8,9 @@ export const data = new SlashCommandBuilder()
   .addRoleOption(option =>
     option.setName('rol')
       .setDescription('Rol de nivel a configurar')
-      .setRequired(true))
+      .setRequired(true)
+      .setAutocomplete(true)
+  )
   .addIntegerOption(option =>
     option.setName('nivel')
       .setDescription('Nivel mínimo para este rol')
@@ -34,4 +36,16 @@ export async function execute(interaction) {
     { upsert: true, new: true }
   );
   return interaction.reply({ content: `El rol <@&${role.id}> ahora está asignado al nivel ${minLevel}.`, ephemeral: true });
+}
+
+// Autocompletado para roles de nivel
+export async function autocomplete(interaction) {
+  const pattern = /^✦─────『(.+)』─────✦$/u;
+  const focusedValue = interaction.options.getFocused();
+  const roles = interaction.guild.roles.cache
+    .filter(role => pattern.test(role.name))
+    .map(role => ({ name: role.name, value: role.id }))
+    .filter(option => option.name.toLowerCase().includes(focusedValue.toLowerCase()))
+    .slice(0, 25);
+  await interaction.respond(roles);
 }

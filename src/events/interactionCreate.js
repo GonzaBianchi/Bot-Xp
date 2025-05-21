@@ -23,6 +23,13 @@ if (fs.existsSync(adminCommandsPath)) {
 }
 
 export default async function(interaction) {
+  if (interaction.isAutocomplete()) {
+    const command = commands.get(interaction.commandName);
+    if (command && typeof command.autocomplete === 'function') {
+      await command.autocomplete(interaction);
+    }
+    return;
+  }
   if (!interaction.isChatInputCommand()) return;
   const command = commands.get(interaction.commandName);
   if (!command) return;
