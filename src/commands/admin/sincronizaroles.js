@@ -7,9 +7,9 @@ const LevelRoleSchema = new mongoose.Schema({
   guildId: { type: String, required: true },
   roleId: { type: String, required: true },
   roleName: { type: String, required: true },
-  minLevel: { type: Number, required: true }
+  minLevel: { type: Number, required: false, default: null }
 });
-LevelRoleSchema.index({ guildId: 1, minLevel: 1 }, { unique: true });
+LevelRoleSchema.index({ guildId: 1, minLevel: 1 }, { unique: true, partialFilterExpression: { minLevel: { $type: 'number' } } });
 export const LevelRole = mongoose.models.LevelRole || mongoose.model('LevelRole', LevelRoleSchema);
 
 export const data = new SlashCommandBuilder()
@@ -27,9 +27,6 @@ export async function execute(interaction) {
   guild.roles.cache.forEach(role => {
     const match = role.name.match(pattern);
     if (match) {
-      // Buscar si ya existe en la base de datos
-      // Si existe, mantener su minLevel
-      // Si no, dejar minLevel en null
       levelRoles.push({
         guildId: guild.id,
         roleId: role.id,
@@ -44,11 +41,19 @@ export async function execute(interaction) {
   }
   // Elimina los anteriores de este guild
   await LevelRole.deleteMany({ guildId: guild.id });
-  await LevelRole.insertMany(levelRoles);
+  // Inserta uno a uno para evitar error de validación
+  for (const role of levelRoles) {
+    await LevelRole.create(role);
+  }
   // Mostrar resumen
   let msg = `Roles sincronizados: ${levelRoles.length}.`;
   if (nuevosSinNivel.length > 0) {
     msg += `\nLos siguientes roles no tienen nivel asignado. Usa /setnivelrol para asignarles un nivel:\n- ` + nuevosSinNivel.join('\n- ');
   }
-  await interaction.editReply(msg);
+  // Solo responde si no se ha respondido antes
+  if (!interaction.replied && !interaction.deferred) {
+    await interaction.reply({ content: msg, ephemeral: true });
+  } else {
+    await interaction.editReply(msg);
+  }
 }
