@@ -7,7 +7,7 @@ const LevelRoleSchema = new mongoose.Schema({
   guildId: { type: String, required: true },
   roleId: { type: String, required: true },
   roleName: { type: String, required: true },
-  minLevel: { type: Number, required: false, default: null }
+  minLevel: { type: Number, required: false }
 });
 LevelRoleSchema.index({ guildId: 1, minLevel: 1 }, { unique: true, partialFilterExpression: { minLevel: { $type: 'number' } } });
 export const LevelRole = mongoose.models.LevelRole || mongoose.model('LevelRole', LevelRoleSchema);
@@ -27,12 +27,14 @@ export async function execute(interaction) {
   guild.roles.cache.forEach(role => {
     const match = role.name.match(pattern);
     if (match) {
-      levelRoles.push({
+      // Solo agrega minLevel si está definido
+      const roleObj = {
         guildId: guild.id,
         roleId: role.id,
-        roleName: role.name,
-        minLevel: null
-      });
+        roleName: role.name
+      };
+      // minLevel solo se agrega si existe
+      levelRoles.push(roleObj);
       nuevosSinNivel.push(role.name);
     }
   });
