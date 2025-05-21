@@ -39,7 +39,7 @@ export async function execute(interaction) {
       }
     });
     if (levelRoles.length === 0) {
-      await interaction.editReply('No se encontraron roles de nivel con el patrón especificado.');
+      await interaction.editReply({ content: 'No se encontraron roles de nivel con el patrón especificado.', flags: 64 });
       return;
     }
     // Elimina los anteriores de este guild
@@ -53,13 +53,13 @@ export async function execute(interaction) {
     if (nuevosSinNivel.length > 0) {
       msg += `\nLos siguientes roles no tienen nivel asignado. Usa /setnivelrol para asignarles un nivel:\n- ` + nuevosSinNivel.join('\n- ');
     }
-    await interaction.editReply(msg);
+    await interaction.editReply({ content: msg, flags: 64 });
   } catch (error) {
     console.error('Error en /sincronizaroles:', error);
     if (!interaction.replied && !interaction.deferred) {
-      await interaction.reply({ content: 'Ocurrió un error al sincronizar los roles. Revisa los logs.', ephemeral: true });
+      await interaction.reply({ content: 'Ocurrió un error al sincronizar los roles. Revisa los logs.', flags: 64 });
     } else {
-      await interaction.editReply('Ocurrió un error al sincronizar los roles. Revisa los logs.');
+      await interaction.editReply({ content: 'Ocurrió un error al sincronizar los roles. Revisa los logs.', flags: 64 });
     }
   }
 }
