@@ -35,15 +35,26 @@ for (const file of eventFiles) {
   }
 }
 
-// --- Registro de comandos slash (sin los de roles) ---
-import { data as nivel } from './commands/nivel.js';
-import { data as top } from './commands/top.js';
-import { data as info } from './commands/info.js';
-import { data as agregaxp } from './commands/admin/agregaxp.js';
-import { data as quitaxp } from './commands/admin/quitaxp.js';
-import { data as establecernivel } from './commands/admin/establecernivel.js';
+// --- Registro dinámico de comandos slash (usuarios y admin) ---
+const commands = [];
 
-const commands = [nivel, top, info, agregaxp, quitaxp, establecernivel];
+// Cargar comandos de usuario
+const commandsPath = path.resolve('./src/commands');
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+  const command = await import(`./commands/${file}`);
+  if (command.data) commands.push(command.data.toJSON());
+}
+
+// Cargar comandos admin
+const adminCommandsPath = path.resolve('./src/commands/admin');
+if (fs.existsSync(adminCommandsPath)) {
+  const adminCommandFiles = fs.readdirSync(adminCommandsPath).filter(file => file.endsWith('.js'));
+  for (const file of adminCommandFiles) {
+    const command = await import(`./commands/admin/${file}`);
+    if (command.data) commands.push(command.data.toJSON());
+  }
+}
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
