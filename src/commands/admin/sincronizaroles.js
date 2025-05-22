@@ -28,12 +28,12 @@ export async function execute(interaction) {
     guild.roles.cache.forEach(role => {
       const match = role.name.match(pattern);
       if (match) {
-        // Solo agrega minLevel si está definido
         const roleObj = {
           guildId: guild.id,
           roleId: role.id,
           roleName: role.name
         };
+        // No agregar minLevel si no existe
         levelRoles.push(roleObj);
         nuevosSinNivel.push(role.name);
       }
