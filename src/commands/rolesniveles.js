@@ -10,7 +10,7 @@ export async function execute(interaction) {
   const guildId = interaction.guild.id;
   const roles = await LevelRole.find({ guildId, minLevel: { $ne: null } }).sort({ minLevel: 1 });
   if (!roles.length) {
-    return interaction.reply({ content: 'No hay roles de nivel configurados en este servidor.', ephemeral: true });
+    return interaction.reply({ content: 'No hay roles de nivel configurados en este servidor.', flags: 64 });
   }
   const desc = roles.map(r => `**Nivel ${r.minLevel}:** <@&${r.roleId}>`).join('\n');
   const embed = new EmbedBuilder()
