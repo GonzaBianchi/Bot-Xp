@@ -30,8 +30,8 @@ export async function execute(interaction) {
   const emptyBars = totalBars - filledBars;
   // Usa emojis para la barra: 🟩 (lleno), ⬜ (vacío)
   const bar = `${'🟩'.repeat(filledBars)}${'⬜'.repeat(emptyBars)}`;
-  // Mensaje superior personalizado
-  const mensaje = `<a:love:1005961056159535104> Felicitaciones nakama ${target}, has avanzado a una nueva parte del Grand Line y ahora eres un pirata de nivel ${user.level}!<:LuffyWow:1354178642497900835>`;
+  // Mensaje superior personalizado con los nuevos IDs de emoji
+  const mensaje = `<a:love:1375278293921828904> Felicitaciones nakama ${target}, has avanzado a una nueva parte del Grand Line y ahora eres un pirata de nivel ${user.level}!<:LuffyWow:1375278276620058696>`;
   const embed = new EmbedBuilder()
     .setTitle(`Nivel de ${target.username}`)
     .setDescription(`${mensaje}\n\nNivel: **${user.level}**\nXP: **${user.xp}/${neededXp}**\n${bar} ${percent}%\nTop: #${rank}`)
