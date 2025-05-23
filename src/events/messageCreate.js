@@ -14,10 +14,19 @@ export default async function(message) {
   const now = Date.now();
   // Verificar cooldown
   if (cooldowns.has(key) && now < cooldowns.get(key)) return;
+  // Obtener datos anteriores
+  const oldUser = await User.findOne({ userId, guildId });
+  const oldLevel = oldUser ? oldUser.level : 1;
   // Calcular XP usando el rango de config.js
   const xpGanada = Math.floor(Math.random() * (XP_PER_MESSAGE.max - XP_PER_MESSAGE.min + 1)) + XP_PER_MESSAGE.min;
   const user = await addXp(userId, guildId, xpGanada);
   await updateMemberRoles(message.member, user.level);
   // Establecer cooldown
   cooldowns.set(key, now + XP_COOLDOWN);
+  // Mensaje de subida de nivel
+  if (user.level > oldLevel) {
+    await message.channel.send({
+      content: `🎉 ¡${message.author} ha subido al nivel ${user.level}! Felicitaciones.`
+    });
+  }
 }

@@ -25,31 +25,32 @@ export async function execute(interaction) {
     const levelRoles = [];
     const nuevosSinNivel = [];
     // Buscar roles que coincidan con el patrón
-    guild.roles.cache.forEach(role => {
+    for (const role of guild.roles.cache.values()) {
       const match = role.name.match(pattern);
       if (match) {
-        const roleObj = {
-          guildId: guild.id,
-          roleId: role.id,
-          roleName: role.name
-        };
-        // No agregar minLevel si no existe
-        levelRoles.push(roleObj);
-        nuevosSinNivel.push(role.name);
+        // Verifica si ya existe en la base de datos
+        const exists = await LevelRole.findOne({ guildId: guild.id, roleId: role.id });
+        if (!exists) {
+          const roleObj = {
+            guildId: guild.id,
+            roleId: role.id,
+            roleName: role.name
+          };
+          levelRoles.push(roleObj);
+          nuevosSinNivel.push(role.name);
+        }
       }
-    });
+    }
     if (levelRoles.length === 0) {
-      await interaction.editReply({ content: 'No se encontraron roles de nivel con el patrón especificado.', flags: 64 });
+      await interaction.editReply({ content: 'No se encontraron roles nuevos de nivel para sincronizar. Los roles existentes no se modificaron.', flags: 64 });
       return;
     }
-    // Elimina los anteriores de este guild
-    await LevelRole.deleteMany({ guildId: guild.id });
-    // Inserta uno a uno para evitar error de validación
+    // Inserta solo los nuevos roles detectados
     for (const role of levelRoles) {
       await LevelRole.create(role);
     }
     // Mostrar resumen
-    let msg = `Roles sincronizados: ${levelRoles.length}.`;
+    let msg = `Roles nuevos sincronizados: ${levelRoles.length}.`;
     if (nuevosSinNivel.length > 0) {
       msg += `\nLos siguientes roles no tienen nivel asignado. Usa /setnivelrol para asignarles un nivel:\n- ` + nuevosSinNivel.join('\n- ');
     }
