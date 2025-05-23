@@ -2,6 +2,7 @@
 import { addXp } from '../utils/xpSystem.js';
 import { updateMemberRoles } from '../utils/roleManager.js';
 import { XP_PER_MESSAGE, XP_COOLDOWN } from '../config.js';
+import User from '../models/User.js';
 
 // Mapa para cooldowns: { 'userId-guildId': timestamp }
 const cooldowns = new Map();
