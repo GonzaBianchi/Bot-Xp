@@ -37,6 +37,18 @@ export default async function(interaction) {
     await command.execute(interaction);
   } catch (error) {
     console.error(error);
-    await interaction.reply({ content: 'Ocurrió un error al ejecutar el comando.', ephemeral: true });
+    if (!interaction.replied && !interaction.deferred) {
+      await interaction.reply({ 
+        content: 'Ocurrió un error al ejecutar el comando.', 
+        ephemeral: true,
+        flags: 64 
+      }).catch(() => {});
+    } else {
+      await interaction.followUp({ 
+        content: 'Ocurrió un error al ejecutar el comando.', 
+        ephemeral: true,
+        flags: 64 
+      }).catch(() => {});
+    }
   }
 }
