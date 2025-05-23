@@ -1,10 +1,10 @@
-// Comando /quitaxp: quita XP a un usuario (admin)
+// Comando /quitarxp: quita XP a un usuario (admin)
 import { SlashCommandBuilder } from 'discord.js';
 import { removeXp } from '../../utils/xpSystem.js';
 import { updateMemberRoles } from '../../utils/roleManager.js';
 
 export const data = new SlashCommandBuilder()
-  .setName('quitaxp')
+  .setName('quitarxp')
   .setDescription('Quita XP a un usuario específico (solo administradores)')
   .addUserOption(option =>
     option.setName('usuario')

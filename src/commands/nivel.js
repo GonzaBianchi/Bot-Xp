@@ -5,7 +5,7 @@ import { calculateLevelXp, getUserRank } from '../utils/xpSystem.js';
 import { createCanvas, loadImage } from 'canvas';
 
 export const data = new SlashCommandBuilder()
-  .setName('nivel')
+  .setName('rank')
   .setDescription('Muestra tu nivel y XP actual o el de otro usuario')
   .addUserOption(option =>
     option.setName('usuario')
@@ -14,6 +14,14 @@ export const data = new SlashCommandBuilder()
   );
 
 export async function execute(interaction) {
+  // Permitir comandos de usuario solo en canal específico
+  const ADMIN_PERMS = 0x00000008; // Administrator
+  const allowedChannelId = '1269848036545134654';
+  // Si el usuario NO es admin y el canal no es el permitido, rechazar
+  if (!interaction.member.permissions.has(ADMIN_PERMS) && interaction.channel.id !== allowedChannelId) {
+    return interaction.reply({ content: 'Solo puedes usar este comando en el canal designado.', ephemeral: true });
+  }
+
   const target = interaction.options.getUser('usuario') || interaction.user;
   const userId = target.id;
   const guildId = interaction.guild.id;
