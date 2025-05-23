@@ -71,10 +71,28 @@ export async function execute(interaction) {
     ctx.clip();
     ctx.drawImage(avatar, avatarX, avatarY, avatarSize, avatarSize);
     ctx.restore();
+    
+    // Obtener el color según el estado del usuario
+    let statusColor;
+    const presence = target.presence?.status || 'offline';
+    switch (presence) {
+      case 'online':
+        statusColor = '#43B581'; // Verde
+        break;
+      case 'idle':
+        statusColor = '#FAA61A'; // Amarillo
+        break;
+      case 'dnd':
+        statusColor = '#F04747'; // Rojo
+        break;
+      default:
+        statusColor = '#747F8D'; // Gris para offline
+    }
+
     // Círculo de estado (más pegado al avatar)
     ctx.beginPath();
     ctx.arc(avatarX + avatarSize - 18, avatarY + avatarSize - 18, 16, 0, Math.PI * 2, true);
-    ctx.fillStyle = '#FFB319'; // color amarillo (online)
+    ctx.fillStyle = statusColor;
     ctx.fill();
     ctx.lineWidth = 4;
     ctx.strokeStyle = '#23272A';
