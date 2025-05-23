@@ -27,7 +27,7 @@ export default async function(message) {
   // Mensaje de subida de nivel
   if (user.level > oldLevel) {
     await message.channel.send({
-      content: `🎉 ¡${message.author} ha subido al nivel ${user.level}! Felicitaciones.`
+      content: `:love: Felicitaciones nakama ${message.author}, has avanzado a una nueva parte del Grand Line y ahora eres un pirata de nivel ${user.level}! :LuffyWow:`
     });
   }
 }

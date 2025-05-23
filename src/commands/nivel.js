@@ -21,11 +21,18 @@ export async function execute(interaction) {
     return interaction.reply({ content: `${target.id === interaction.user.id ? 'No tienes' : `El usuario ${target}`} no tiene datos de nivel aún.`, ephemeral: true });
   }
   const neededXp = calculateLevelXp(user.level);
-  // Obtener ranking del usuario consultado
   const rank = await getUserRank(userId, guildId);
+  // Calcular porcentaje de XP
+  const percent = Math.floor((user.xp / neededXp) * 100);
+  // Generar barra de experiencia
+  const totalBars = 20;
+  const filledBars = Math.round((percent / 100) * totalBars);
+  const emptyBars = totalBars - filledBars;
+  const bar = `【${'█'.repeat(filledBars)}${'░'.repeat(emptyBars)}】`;
   const embed = new EmbedBuilder()
     .setTitle(`Nivel de ${target.username}`)
-    .setDescription(`Nivel: **${user.level}**\nXP: **${user.xp}/${neededXp}**\nRanking: #${rank}`)
-    .setColor(0x00AE86);
+    .setDescription(`Nivel: **${user.level}**\nXP: **${user.xp}/${neededXp}**\n${bar} ${percent}%\nTop: #${rank}`)
+    .setColor(0x00AE86)
+    .setThumbnail(target.displayAvatarURL({ extension: 'png', size: 256 }));
   return interaction.reply({ embeds: [embed] });
 }
