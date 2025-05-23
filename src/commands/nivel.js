@@ -14,11 +14,15 @@ export const data = new SlashCommandBuilder()
   );
 
 export async function execute(interaction) {
-  try {    // Permitir comandos de usuario solo en canal específico
+  try {
+    // Diferir la respuesta inmediatamente para evitar el timeout
+    await interaction.deferReply();
+
+    // Permitir comandos de usuario solo en canal específico
     const allowedChannelId = '1269848036545134654';
     // Si el usuario NO es admin y el canal no es el permitido, rechazar
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator) && interaction.channel.id !== allowedChannelId) {
-      return interaction.reply({ content: 'Solo puedes usar este comando en el canal designado.', flags: 64 });
+      return interaction.editReply({ content: 'Solo puedes usar este comando en el canal designado.', flags: 64 });
     }
 
     const target = interaction.options.getUser('usuario') || interaction.user;
@@ -26,7 +30,7 @@ export async function execute(interaction) {
     const guildId = interaction.guild.id;
     const user = await User.findOne({ userId, guildId });
     if (!user) {
-      return interaction.reply({ 
+      return interaction.editReply({ 
         content: `${target.id === interaction.user.id ? 'No tienes' : `El usuario ${target}`} no tiene datos de nivel aún.`, 
         flags: 64 
       });
@@ -36,8 +40,8 @@ export async function execute(interaction) {
 
     // --- Generar la imagen tipo rank card estilo MEE6 ---
     // Configuración del canvas
-    const width = 934;  // Más ancho para mejor distribución
-    const height = 282; // Más alto para acomodar elementos más grandes
+    const width = 1100;  // Aumentado de 934
+    const height = 340; // Aumentado de 282
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
 
@@ -62,23 +66,23 @@ export async function execute(interaction) {
     // Card interna con borde redondeado
     ctx.fillStyle = 'rgba(35, 39, 42, 0.5)';
     ctx.beginPath();
-    ctx.moveTo(20, 20);
-    ctx.lineTo(width - 20, 20);
-    ctx.quadraticCurveTo(width - 10, 20, width - 10, 30);
-    ctx.lineTo(width - 10, height - 30);
-    ctx.quadraticCurveTo(width - 10, height - 10, width - 30, height - 10);
-    ctx.lineTo(30, height - 10);
-    ctx.quadraticCurveTo(20, height - 10, 20, height - 30);
-    ctx.lineTo(20, 30);
-    ctx.quadraticCurveTo(20, 20, 30, 20);
+    ctx.moveTo(25, 25);
+    ctx.lineTo(width - 25, 25);
+    ctx.quadraticCurveTo(width - 15, 25, width - 15, 35);
+    ctx.lineTo(width - 15, height - 35);
+    ctx.quadraticCurveTo(width - 15, height - 15, width - 35, height - 15);
+    ctx.lineTo(35, height - 15);
+    ctx.quadraticCurveTo(25, height - 15, 25, height - 35);
+    ctx.lineTo(25, 35);
+    ctx.quadraticCurveTo(25, 25, 35, 25);
     ctx.closePath();
     ctx.fill();
 
     // Avatar más grande
-    const avatarSize = 180; // Aumentado de 120
-    const avatarX = 40;
-    const avatarY = 51;
-    const avatarURL = target.displayAvatarURL({ extension: 'png', size: 256 }); // Mejor calidad
+    const avatarSize = 220; // Aumentado de 180
+    const avatarX = 45;
+    const avatarY = 60;
+    const avatarURL = target.displayAvatarURL({ extension: 'png', size: 256 });
     const avatar = await loadImage(avatarURL);
     ctx.save();
     ctx.beginPath();
@@ -112,50 +116,41 @@ export async function execute(interaction) {
     }
 
     // Círculo de estado (más grande)
-    const statusSize = 30; // Aumentado
+    const statusSize = 38; // Aumentado de 30
     ctx.beginPath();
-    ctx.arc(avatarX + avatarSize - 25, avatarY + avatarSize - 25, statusSize, 0, Math.PI * 2, true);
+    ctx.arc(avatarX + avatarSize - 30, avatarY + avatarSize - 30, statusSize, 0, Math.PI * 2, true);
     ctx.fillStyle = statusColor;
     ctx.fill();
-    ctx.lineWidth = 6;
+    ctx.lineWidth = 8;
     ctx.strokeStyle = '#23272A';
     ctx.stroke();
 
-    // Nombre de usuario (más grande)
-    ctx.font = '38px Sans-serif';
+    // Nombre de usuario (más grande y más abajo)
+    ctx.font = '42px Sans-serif';
     ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'left';
-    ctx.fillText(target.username, 240, 120);
+    ctx.fillText(target.username, 290, 240); // Movido más abajo
 
     // Rango y nivel (más grandes)
-    ctx.font = 'bold 24px Sans-serif';
+    ctx.font = 'bold 28px Sans-serif';
     ctx.fillStyle = '#B0B0B0';
-    ctx.fillText('RANGO', 580, 80);
-    ctx.font = 'bold 52px Sans-serif';
+    ctx.fillText('RANGO', 680, 90);
+    ctx.font = 'bold 60px Sans-serif';
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillText(`#${rank}`, 580, 130);
+    ctx.fillText(`#${rank}`, 680, 150);
     
-    ctx.font = 'bold 24px Sans-serif';
+    ctx.font = 'bold 28px Sans-serif';
     ctx.fillStyle = '#3CB4E7';
-    ctx.fillText('NIVEL', 750, 80);
-    ctx.font = 'bold 52px Sans-serif';
+    ctx.fillText('NIVEL', 880, 90);
+    ctx.font = 'bold 60px Sans-serif';
     ctx.fillStyle = '#3CB4E7';
-    ctx.fillText(`${user.level}`, 750, 130);
-
-    // XP texto (más grande)
-    ctx.font = '26px Sans-serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.textAlign = 'left';
-    function formatXP(xp) {
-      return xp >= 1000 ? (xp / 1000).toFixed(2).replace(/\.00$/, '') + 'K' : xp;
-    }
-    ctx.fillText(`${formatXP(user.xp)} / ${formatXP(neededXp)} XP`, 580, 180);
+    ctx.fillText(`${user.level}`, 880, 150);
 
     // Barra de experiencia más grande y estilizada
-    const barX = 240;
-    const barY = 200;
-    const barWidth = 650; // Más ancha
-    const barHeight = 35;  // Más alta
+    const barX = 290;
+    const barY = 260;
+    const barWidth = 760; // Más ancha
+    const barHeight = 40;  // Más alta
     const percent = Math.floor((user.xp / neededXp) * 100);
     
     // Fondo barra
@@ -185,10 +180,19 @@ export async function execute(interaction) {
     ctx.closePath();
     ctx.fill();
 
+    // XP texto (más grande y a la derecha)
+    ctx.font = '28px Sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'right'; // Alineado a la derecha
+    function formatXP(xp) {
+      return xp >= 1000 ? (xp / 1000).toFixed(2).replace(/\.00$/, '') + 'K' : xp;
+    }
+    ctx.fillText(`${formatXP(user.xp)} / ${formatXP(neededXp)} XP`, barX + barWidth - 10, barY - 10);
+
     // Adjuntar imagen
     const buffer = canvas.toBuffer('image/png');
     const attachment = new AttachmentBuilder(buffer, { name: 'rank.png' });
-    return interaction.reply({
+    return interaction.editReply({
       files: [attachment],
       embeds: [{ image: { url: 'attachment://rank.png' } }]
     });
@@ -196,6 +200,11 @@ export async function execute(interaction) {
     console.error('Error en comando rank:', error);
     if (!interaction.replied && !interaction.deferred) {
       await interaction.reply({ 
+        content: 'Ocurrió un error al mostrar el nivel.', 
+        flags: 64 
+      });
+    } else {
+      await interaction.editReply({ 
         content: 'Ocurrió un error al mostrar el nivel.', 
         flags: 64 
       });
