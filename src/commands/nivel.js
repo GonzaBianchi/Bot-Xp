@@ -1,7 +1,8 @@
 // Comando /nivel: muestra el nivel y XP actual del usuario
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } from 'discord.js';
 import User from '../models/User.js';
 import { calculateLevelXp, getUserRank } from '../utils/xpSystem.js';
+import { createCanvas, loadImage } from 'canvas';
 
 export const data = new SlashCommandBuilder()
   .setName('nivel')
@@ -22,19 +23,60 @@ export async function execute(interaction) {
   }
   const neededXp = calculateLevelXp(user.level);
   const rank = await getUserRank(userId, guildId);
-  // Calcular porcentaje de XP
+
+  // --- Generar la imagen tipo rank card ---
+  const width = 800;
+  const height = 240;
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+
+  // Fondo
+  ctx.fillStyle = '#23272A';
+  ctx.fillRect(0, 0, width, height);
+
+  // Avatar
+  const avatarURL = target.displayAvatarURL({ extension: 'png', size: 128 });
+  const avatar = await loadImage(avatarURL);
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(120, 120, 80, 0, Math.PI * 2, true);
+  ctx.closePath();
+  ctx.clip();
+  ctx.drawImage(avatar, 40, 40, 160, 160);
+  ctx.restore();
+
+  // Nombre y nivel
+  ctx.font = 'bold 36px Sans';
+  ctx.fillStyle = '#fff';
+  ctx.fillText(target.username, 220, 90);
+  ctx.font = '28px Sans';
+  ctx.fillStyle = '#FFD700';
+  ctx.fillText(`Nivel: ${user.level}`, 220, 140);
+  ctx.fillStyle = '#00BFFF';
+  ctx.fillText(`Top: #${rank}`, 220, 180);
+
+  // Barra de experiencia
+  const barX = 220;
+  const barY = 200;
+  const barWidth = 520;
+  const barHeight = 32;
   const percent = Math.floor((user.xp / neededXp) * 100);
-  // Generar barra de experiencia mejorada
-  const totalBars = 16;
-  const filledBars = Math.round((percent / 100) * totalBars);
-  const emptyBars = totalBars - filledBars;
-  // Usa emojis para la barra: 🟩 (lleno), ⬜ (vacío)
-  const bar = `${'🟩'.repeat(filledBars)}${'⬜'.repeat(emptyBars)}`;
-  // Mensaje superior personalizado con los nuevos IDs de emoji
-  const embed = new EmbedBuilder()
-    .setTitle(`Nivel de ${target.username}`)
-    .setDescription(`\n\nNivel: **${user.level}**\nXP: **${user.xp}/${neededXp}**\n${bar} ${percent}%\nTop: #${rank}`)
-    .setColor(0x00AE86)
-    .setThumbnail(target.displayAvatarURL({ extension: 'png', size: 256 }));
-  return interaction.reply({ embeds: [embed] });
+  // Fondo barra
+  ctx.fillStyle = '#444';
+  ctx.fillRect(barX, barY, barWidth, barHeight);
+  // Barra llena
+  ctx.fillStyle = '#43B581';
+  ctx.fillRect(barX, barY, Math.floor(barWidth * (percent / 100)), barHeight);
+  // Texto XP
+  ctx.font = '22px Sans';
+  ctx.fillStyle = '#fff';
+  ctx.fillText(`${user.xp} / ${neededXp} XP (${percent}%)`, barX + 10, barY + 24);
+
+  // Adjuntar imagen
+  const buffer = canvas.toBuffer('image/png');
+  const attachment = new AttachmentBuilder(buffer, { name: 'rank.png' });
+  return interaction.reply({
+    files: [attachment],
+    embeds: [{ image: { url: 'attachment://rank.png' } }]
+  });
 }
