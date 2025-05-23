@@ -24,14 +24,17 @@ export async function execute(interaction) {
   const rank = await getUserRank(userId, guildId);
   // Calcular porcentaje de XP
   const percent = Math.floor((user.xp / neededXp) * 100);
-  // Generar barra de experiencia
-  const totalBars = 20;
+  // Generar barra de experiencia mejorada
+  const totalBars = 16;
   const filledBars = Math.round((percent / 100) * totalBars);
   const emptyBars = totalBars - filledBars;
-  const bar = `【${'█'.repeat(filledBars)}${'░'.repeat(emptyBars)}】`;
+  // Usa emojis para la barra: 🟩 (lleno), ⬜ (vacío)
+  const bar = `${'🟩'.repeat(filledBars)}${'⬜'.repeat(emptyBars)}`;
+  // Mensaje superior personalizado
+  const mensaje = `<a:love:1005961056159535104> Felicitaciones nakama ${target}, has avanzado a una nueva parte del Grand Line y ahora eres un pirata de nivel ${user.level}!<:LuffyWow:1354178642497900835>`;
   const embed = new EmbedBuilder()
     .setTitle(`Nivel de ${target.username}`)
-    .setDescription(`Nivel: **${user.level}**\nXP: **${user.xp}/${neededXp}**\n${bar} ${percent}%\nTop: #${rank}`)
+    .setDescription(`${mensaje}\n\nNivel: **${user.level}**\nXP: **${user.xp}/${neededXp}**\n${bar} ${percent}%\nTop: #${rank}`)
     .setColor(0x00AE86)
     .setThumbnail(target.displayAvatarURL({ extension: 'png', size: 256 }));
   return interaction.reply({ embeds: [embed] });
