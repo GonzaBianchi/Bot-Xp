@@ -1,5 +1,5 @@
 // Comando /nivel: muestra el nivel y XP actual del usuario
-import { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder, PermissionFlagsBits } from 'discord.js';
 import User from '../models/User.js';
 import { calculateLevelXp, getUserRank } from '../utils/xpSystem.js';
 import { createCanvas, loadImage } from 'canvas';
@@ -14,12 +14,10 @@ export const data = new SlashCommandBuilder()
   );
 
 export async function execute(interaction) {
-  try {
-    // Permitir comandos de usuario solo en canal específico
-    const ADMIN_PERMS = 0x00000008; // Administrator
+  try {    // Permitir comandos de usuario solo en canal específico
     const allowedChannelId = '1269848036545134654';
-    // Si el usuario NO es admin y el canal no es el permitido, rechazar    
-    if (!interaction.member.permissions.has(ADMIN_PERMS) && interaction.channel.id !== allowedChannelId) {
+    // Si el usuario NO es admin y el canal no es el permitido, rechazar
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator) && interaction.channel.id !== allowedChannelId) {
       return interaction.reply({ content: 'Solo puedes usar este comando en el canal designado.', flags: 64 });
     }
 

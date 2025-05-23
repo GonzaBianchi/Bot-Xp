@@ -63,12 +63,11 @@ export async function execute(interaction) {
   }
   const totalUsers = await User.countDocuments({ guildId });
   const totalPages = Math.ceil(totalUsers / pageSize);
-
-  const message = await interaction.reply({ 
+  await interaction.reply({ 
     embeds: [embed], 
-    components: [row],
-    fetchReply: true 
+    components: [row]
   });
+  const message = await interaction.fetchReply();
 
   // Crear colector de botones
   const collector = message.createMessageComponentCollector({ 
