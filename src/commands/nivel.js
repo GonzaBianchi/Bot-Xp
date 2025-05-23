@@ -24,53 +24,111 @@ export async function execute(interaction) {
   const neededXp = calculateLevelXp(user.level);
   const rank = await getUserRank(userId, guildId);
 
-  // --- Generar la imagen tipo rank card ---
+  // --- Generar la imagen tipo rank card estilo MEE6 ---
+  // Fondo general
   const width = 800;
   const height = 240;
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
-
-  // Fondo
-  ctx.fillStyle = '#23272A';
+  ctx.fillStyle = '#2C2F33';
   ctx.fillRect(0, 0, width, height);
 
-  // Avatar
+  // Card interna (borde redondeado)
+  ctx.fillStyle = '#23272A';
+  ctx.beginPath();
+  ctx.moveTo(20, 20);
+  ctx.lineTo(width - 20, 20);
+  ctx.quadraticCurveTo(width - 10, 20, width - 10, 30);
+  ctx.lineTo(width - 10, height - 30);
+  ctx.quadraticCurveTo(width - 10, height - 10, width - 30, height - 10);
+  ctx.lineTo(30, height - 10);
+  ctx.quadraticCurveTo(20, height - 10, 20, height - 30);
+  ctx.lineTo(20, 30);
+  ctx.quadraticCurveTo(20, 20, 30, 20);
+  ctx.closePath();
+  ctx.fill();
+
+  // Avatar con borde y estado
   const avatarURL = target.displayAvatarURL({ extension: 'png', size: 128 });
   const avatar = await loadImage(avatarURL);
   ctx.save();
   ctx.beginPath();
-  ctx.arc(120, 120, 80, 0, Math.PI * 2, true);
+  ctx.arc(100, 120, 60, 0, Math.PI * 2, true);
   ctx.closePath();
   ctx.clip();
-  ctx.drawImage(avatar, 40, 40, 160, 160);
+  ctx.drawImage(avatar, 40, 60, 120, 120);
   ctx.restore();
+  // Círculo de estado (abajo a la derecha del avatar)
+  ctx.beginPath();
+  ctx.arc(160, 180, 16, 0, Math.PI * 2, true);
+  ctx.fillStyle = '#FFB319'; // color amarillo (online)
+  ctx.fill();
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = '#23272A';
+  ctx.stroke();
 
-  // Nombre y nivel
-  ctx.font = 'bold 36px Sans';
+  // Nombre de usuario
+  ctx.font = '32px Sans-serif';
   ctx.fillStyle = '#fff';
-  ctx.fillText(target.username, 220, 90);
-  ctx.font = '28px Sans';
-  ctx.fillStyle = '#FFD700';
-  ctx.fillText(`Nivel: ${user.level}`, 220, 140);
-  ctx.fillStyle = '#00BFFF';
-  ctx.fillText(`Top: #${rank}`, 220, 180);
+  ctx.textAlign = 'left';
+  ctx.fillText(target.username, 200, 110);
 
-  // Barra de experiencia
-  const barX = 220;
-  const barY = 200;
-  const barWidth = 520;
-  const barHeight = 32;
+  // Rango y nivel
+  ctx.font = '20px Sans-serif';
+  ctx.fillStyle = '#B0B0B0';
+  ctx.fillText('RANGO', 540, 70);
+  ctx.font = 'bold 44px Sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.fillText(`#${rank}`, 540, 115);
+  ctx.font = '20px Sans-serif';
+  ctx.fillStyle = '#3CB4E7';
+  ctx.fillText('NIVEL', 670, 70);
+  ctx.font = 'bold 44px Sans-serif';
+  ctx.fillStyle = '#3CB4E7';
+  ctx.fillText(`${user.level}`, 670, 115);
+
+  // XP texto
+  ctx.font = '22px Sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'left';
+  // XP actual y XP total, formato K
+  function formatXP(xp) {
+    return xp >= 1000 ? (xp / 1000).toFixed(2).replace(/\.00$/, '') + 'K' : xp;
+  }
+  ctx.fillText(`${formatXP(user.xp)} / ${formatXP(neededXp)} XP`, 540, 160);
+  ctx.globalAlpha = 0.5;
+  ctx.font = '18px Sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.fillText('XP', 720, 160);
+  ctx.globalAlpha = 1;
+
+  // Barra de experiencia (redondeada)
+  const barX = 200;
+  const barY = 180;
+  const barWidth = 500;
+  const barHeight = 28;
   const percent = Math.floor((user.xp / neededXp) * 100);
   // Fondo barra
-  ctx.fillStyle = '#444';
-  ctx.fillRect(barX, barY, barWidth, barHeight);
+  ctx.lineJoin = 'round';
+  ctx.fillStyle = '#444B53';
+  ctx.beginPath();
+  ctx.moveTo(barX, barY + barHeight / 2);
+  ctx.arcTo(barX, barY, barX + barWidth, barY, barHeight / 2);
+  ctx.arcTo(barX + barWidth, barY, barX + barWidth, barY + barHeight, barHeight / 2);
+  ctx.arcTo(barX + barWidth, barY + barHeight, barX, barY + barHeight, barHeight / 2);
+  ctx.arcTo(barX, barY + barHeight, barX, barY, barHeight / 2);
+  ctx.closePath();
+  ctx.fill();
   // Barra llena
-  ctx.fillStyle = '#43B581';
-  ctx.fillRect(barX, barY, Math.floor(barWidth * (percent / 100)), barHeight);
-  // Texto XP
-  ctx.font = '22px Sans';
-  ctx.fillStyle = '#fff';
-  ctx.fillText(`${user.xp} / ${neededXp} XP (${percent}%)`, barX + 10, barY + 24);
+  ctx.fillStyle = '#3CB4E7';
+  ctx.beginPath();
+  ctx.moveTo(barX, barY + barHeight / 2);
+  ctx.arcTo(barX, barY, barX + barWidth * (percent / 100), barY, barHeight / 2);
+  ctx.arcTo(barX + barWidth * (percent / 100), barY, barX + barWidth * (percent / 100), barY + barHeight, barHeight / 2);
+  ctx.arcTo(barX + barWidth * (percent / 100), barY + barHeight, barX, barY + barHeight, barHeight / 2);
+  ctx.arcTo(barX, barY + barHeight, barX, barY, barHeight / 2);
+  ctx.closePath();
+  ctx.fill();
 
   // Adjuntar imagen
   const buffer = canvas.toBuffer('image/png');
