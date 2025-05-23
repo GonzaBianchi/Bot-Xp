@@ -42,15 +42,21 @@ export async function execute(interaction) {
     const ctx = canvas.getContext('2d');
 
     // Cargar y aplicar imagen de fondo con blur
-    const backgroundImage = await loadImage('https://media.discordapp.net/attachments/1335116931325497344/1375610821769560075/25d33ab135a483914d9998f0b235973c.jpg');
+    const backgroundImage = await loadImage('./src/assets/25d33ab135a483914d9998f0b235973c.jpg');
     
-    // Dibujar fondo con blur
-    ctx.filter = 'blur(8px)'; // Aplicar blur
-    ctx.drawImage(backgroundImage, 0, 0, width, height);
+    // Dibujar fondo con blur y ajustar tamaño para cubrir todo el canvas
+    ctx.filter = 'blur(8px)';
+    
+    // Calcular dimensiones para mantener la proporción y cubrir todo el canvas
+    const scale = Math.max(width / backgroundImage.width, height / backgroundImage.height);
+    const x = (width - backgroundImage.width * scale) * 0.5;
+    const y = (height - backgroundImage.height * scale) * 0.5;
+    
+    ctx.drawImage(backgroundImage, x, y, backgroundImage.width * scale, backgroundImage.height * scale);
     ctx.filter = 'none';
 
     // Overlay semitransparente para mejorar legibilidad
-    ctx.fillStyle = 'rgba(35, 39, 42, 0.8)';
+    ctx.fillStyle = 'rgba(35, 39, 42, 0.5)';
     ctx.fillRect(0, 0, width, height);
 
     // Card interna con borde redondeado
