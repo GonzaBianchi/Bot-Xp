@@ -35,16 +35,26 @@ export async function execute(interaction) {
     const rank = await getUserRank(userId, guildId);
 
     // --- Generar la imagen tipo rank card estilo MEE6 ---
-    // Fondo general
-    const width = 800;
-    const height = 240;
+    // Configuración del canvas
+    const width = 934;  // Más ancho para mejor distribución
+    const height = 282; // Más alto para acomodar elementos más grandes
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#2C2F33';
+
+    // Cargar y aplicar imagen de fondo con blur
+    const backgroundImage = await loadImage('https://media.discordapp.net/attachments/1335116931325497344/1375610821769560075/25d33ab135a483914d9998f0b235973c.jpg');
+    
+    // Dibujar fondo con blur
+    ctx.filter = 'blur(8px)'; // Aplicar blur
+    ctx.drawImage(backgroundImage, 0, 0, width, height);
+    ctx.filter = 'none';
+
+    // Overlay semitransparente para mejorar legibilidad
+    ctx.fillStyle = 'rgba(35, 39, 42, 0.8)';
     ctx.fillRect(0, 0, width, height);
 
-    // Card interna (borde redondeado)
-    ctx.fillStyle = '#23272A';
+    // Card interna con borde redondeado
+    ctx.fillStyle = 'rgba(35, 39, 42, 0.5)';
     ctx.beginPath();
     ctx.moveTo(20, 20);
     ctx.lineTo(width - 20, 20);
@@ -58,11 +68,11 @@ export async function execute(interaction) {
     ctx.closePath();
     ctx.fill();
 
-    // Avatar más grande y estado más pegado
-    const avatarSize = 120;
-    const avatarX = 60;
-    const avatarY = 60;
-    const avatarURL = target.displayAvatarURL({ extension: 'png', size: 128 });
+    // Avatar más grande
+    const avatarSize = 180; // Aumentado de 120
+    const avatarX = 40;
+    const avatarY = 51;
+    const avatarURL = target.displayAvatarURL({ extension: 'png', size: 256 }); // Mejor calidad
     const avatar = await loadImage(avatarURL);
     ctx.save();
     ctx.beginPath();
@@ -83,69 +93,68 @@ export async function execute(interaction) {
     const presence = member?.presence?.status || 'offline';
     switch (presence) {
       case 'online':
-        statusColor = '#43B581'; // Verde
+        statusColor = '#43B581';
         break;
       case 'idle':
-        statusColor = '#FAA61A'; // Amarillo
+        statusColor = '#FAA61A';
         break;
       case 'dnd':
-        statusColor = '#F04747'; // Rojo
+        statusColor = '#F04747';
         break;
       default:
-        statusColor = '#747F8D'; // Gris para offline
+        statusColor = '#747F8D';
     }
 
-    // Círculo de estado (más pegado al avatar)
+    // Círculo de estado (más grande)
+    const statusSize = 30; // Aumentado
     ctx.beginPath();
-    ctx.arc(avatarX + avatarSize - 18, avatarY + avatarSize - 18, 16, 0, Math.PI * 2, true);
+    ctx.arc(avatarX + avatarSize - 25, avatarY + avatarSize - 25, statusSize, 0, Math.PI * 2, true);
     ctx.fillStyle = statusColor;
     ctx.fill();
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 6;
     ctx.strokeStyle = '#23272A';
     ctx.stroke();
 
-    // Nombre de usuario
-    ctx.font = '32px Sans-serif';
-    ctx.fillStyle = '#fff';
+    // Nombre de usuario (más grande)
+    ctx.font = '38px Sans-serif';
+    ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'left';
-    ctx.fillText(target.username, 200, 110);
+    ctx.fillText(target.username, 240, 120);
 
-    // Rango y nivel
-    ctx.font = '20px Sans-serif';
+    // Rango y nivel (más grandes)
+    ctx.font = 'bold 24px Sans-serif';
     ctx.fillStyle = '#B0B0B0';
-    ctx.fillText('RANGO', 540, 70);
-    ctx.font = 'bold 44px Sans-serif';
-    ctx.fillStyle = '#fff';
-    ctx.fillText(`#${rank}`, 540, 115);
-    ctx.font = '20px Sans-serif';
+    ctx.fillText('RANGO', 580, 80);
+    ctx.font = 'bold 52px Sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(`#${rank}`, 580, 130);
+    
+    ctx.font = 'bold 24px Sans-serif';
     ctx.fillStyle = '#3CB4E7';
-    ctx.fillText('NIVEL', 670, 70);
-    ctx.font = 'bold 44px Sans-serif';
+    ctx.fillText('NIVEL', 750, 80);
+    ctx.font = 'bold 52px Sans-serif';
     ctx.fillStyle = '#3CB4E7';
-    ctx.fillText(`${user.level}`, 670, 115);
+    ctx.fillText(`${user.level}`, 750, 130);
 
-    // XP texto (solo una vez, sin repetir "XP")
-    ctx.font = '22px Sans-serif';
-    ctx.fillStyle = '#fff';
+    // XP texto (más grande)
+    ctx.font = '26px Sans-serif';
+    ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'left';
     function formatXP(xp) {
       return xp >= 1000 ? (xp / 1000).toFixed(2).replace(/\.00$/, '') + 'K' : xp;
     }
-    ctx.fillText(`${formatXP(user.xp)} / ${formatXP(neededXp)} XP`, 540, 160);
-    ctx.globalAlpha = 0.5;
-    ctx.font = '18px Sans-serif';
-    ctx.fillStyle = '#fff';
-    ctx.globalAlpha = 1;
+    ctx.fillText(`${formatXP(user.xp)} / ${formatXP(neededXp)} XP`, 580, 180);
 
-    // Barra de experiencia (redondeada)
-    const barX = 200;
-    const barY = 180;
-    const barWidth = 500;
-    const barHeight = 28;
+    // Barra de experiencia más grande y estilizada
+    const barX = 240;
+    const barY = 200;
+    const barWidth = 650; // Más ancha
+    const barHeight = 35;  // Más alta
     const percent = Math.floor((user.xp / neededXp) * 100);
+    
     // Fondo barra
     ctx.lineJoin = 'round';
-    ctx.fillStyle = '#444B53';
+    ctx.fillStyle = 'rgba(68, 75, 83, 0.5)';
     ctx.beginPath();
     ctx.moveTo(barX, barY + barHeight / 2);
     ctx.arcTo(barX, barY, barX + barWidth, barY, barHeight / 2);
@@ -154,8 +163,13 @@ export async function execute(interaction) {
     ctx.arcTo(barX, barY + barHeight, barX, barY, barHeight / 2);
     ctx.closePath();
     ctx.fill();
-    // Barra llena
-    ctx.fillStyle = '#3CB4E7';
+    
+    // Barra de progreso con gradiente
+    const gradient = ctx.createLinearGradient(barX, 0, barX + barWidth, 0);
+    gradient.addColorStop(0, '#3CB4E7');    // Azul
+    gradient.addColorStop(1, '#73E6FF');    // Celeste
+    
+    ctx.fillStyle = gradient;
     ctx.beginPath();
     ctx.moveTo(barX, barY + barHeight / 2);
     ctx.arcTo(barX, barY, barX + barWidth * (percent / 100), barY, barHeight / 2);
