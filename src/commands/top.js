@@ -14,7 +14,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
   const pagina = interaction.options.getInteger('pagina') || 1;
   const guildId = interaction.guild.id;
-  const pageSize = 50;
+  const pageSize = 20;
   const skip = (pagina - 1) * pageSize;
   const totalUsers = await User.countDocuments({ guildId });
   const topUsers = await User.find({ guildId })

@@ -6,6 +6,7 @@ import User from '../models/User.js';
 
 // Mapa para cooldowns: { 'userId-guildId': timestamp }
 const cooldowns = new Map();
+const LEVEL_UP_CHANNEL_ID = '1269848036545134654';
 
 export default async function(message) {
   if (message.author.bot || !message.guild) return;
@@ -25,10 +26,13 @@ export default async function(message) {
   // Establecer cooldown
   cooldowns.set(key, now + XP_COOLDOWN);
   // Mensaje de subida de nivel
-  const mensaje = `<a:love:1375278293921828904> Felicitaciones nakama ${message.author}, has avanzado a una nueva parte del Grand Line y ahora eres un pirata de nivel ${user.level}!<:LuffyWow:1375278276620058696>`;
   if (user.level > oldLevel) {
-    await message.channel.send({
-      content: `${mensaje}`,
-    });
+    const mensaje = `<a:love:1375278293921828904> Felicitaciones nakama ${message.author}, has avanzado a una nueva parte del Grand Line y ahora eres un pirata de nivel ${user.level}!<:LuffyWow:1375278276620058696>`;
+    const levelUpChannel = message.guild.channels.cache.get(LEVEL_UP_CHANNEL_ID);
+    if (levelUpChannel) {
+      await levelUpChannel.send({ content: mensaje });
+    } else {
+      await message.channel.send({ content: mensaje });
+    }
   }
 }
