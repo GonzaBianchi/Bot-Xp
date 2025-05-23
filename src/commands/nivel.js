@@ -97,12 +97,10 @@ export async function execute(interaction) {
   function formatXP(xp) {
     return xp >= 1000 ? (xp / 1000).toFixed(2).replace(/\.00$/, '') + 'K' : xp;
   }
-  ctx.fillText(`${formatXP(user.xp)} / ${formatXP(neededXp)}`, 540, 160);
+  ctx.fillText(`${formatXP(user.xp)} / ${formatXP(neededXp)} XP`, 540, 160);
   ctx.globalAlpha = 0.5;
   ctx.font = '18px Sans-serif';
   ctx.fillStyle = '#fff';
-  ctx.fillText('XP', 720, 160);
-  ctx.globalAlpha = 1;
 
   // Barra de experiencia (redondeada)
   const barX = 200;
