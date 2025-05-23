@@ -72,9 +72,15 @@ export async function execute(interaction) {
     ctx.drawImage(avatar, avatarX, avatarY, avatarSize, avatarSize);
     ctx.restore();
     
-    // Obtener el color según el estado del usuario
+    // Buscar el GuildMember para obtener la presencia real
+    let member = null;
+    try {
+      member = await interaction.guild.members.fetch(userId);
+    } catch (e) {
+      // Puede fallar si el usuario no está en el servidor
+    }
     let statusColor;
-    const presence = target.presence?.status || 'offline';
+    const presence = member?.presence?.status || 'offline';
     switch (presence) {
       case 'online':
         statusColor = '#43B581'; // Verde
