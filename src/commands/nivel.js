@@ -48,19 +48,22 @@ export async function execute(interaction) {
   ctx.closePath();
   ctx.fill();
 
-  // Avatar con borde y estado
+  // Avatar más grande y estado más pegado
+  const avatarSize = 120;
+  const avatarX = 60;
+  const avatarY = 60;
   const avatarURL = target.displayAvatarURL({ extension: 'png', size: 128 });
   const avatar = await loadImage(avatarURL);
   ctx.save();
   ctx.beginPath();
-  ctx.arc(100, 120, 60, 0, Math.PI * 2, true);
+  ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2, true);
   ctx.closePath();
   ctx.clip();
-  ctx.drawImage(avatar, 40, 60, 120, 120);
+  ctx.drawImage(avatar, avatarX, avatarY, avatarSize, avatarSize);
   ctx.restore();
-  // Círculo de estado (abajo a la derecha del avatar)
+  // Círculo de estado (más pegado al avatar)
   ctx.beginPath();
-  ctx.arc(160, 180, 16, 0, Math.PI * 2, true);
+  ctx.arc(avatarX + avatarSize - 18, avatarY + avatarSize - 18, 16, 0, Math.PI * 2, true);
   ctx.fillStyle = '#FFB319'; // color amarillo (online)
   ctx.fill();
   ctx.lineWidth = 4;
@@ -87,15 +90,14 @@ export async function execute(interaction) {
   ctx.fillStyle = '#3CB4E7';
   ctx.fillText(`${user.level}`, 670, 115);
 
-  // XP texto
+  // XP texto (solo una vez, sin repetir "XP")
   ctx.font = '22px Sans-serif';
   ctx.fillStyle = '#fff';
   ctx.textAlign = 'left';
-  // XP actual y XP total, formato K
   function formatXP(xp) {
     return xp >= 1000 ? (xp / 1000).toFixed(2).replace(/\.00$/, '') + 'K' : xp;
   }
-  ctx.fillText(`${formatXP(user.xp)} / ${formatXP(neededXp)} XP`, 540, 160);
+  ctx.fillText(`${formatXP(user.xp)} / ${formatXP(neededXp)}`, 540, 160);
   ctx.globalAlpha = 0.5;
   ctx.font = '18px Sans-serif';
   ctx.fillStyle = '#fff';
