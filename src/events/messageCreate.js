@@ -25,9 +25,10 @@ export default async function(message) {
   // Establecer cooldown
   cooldowns.set(key, now + XP_COOLDOWN);
   // Mensaje de subida de nivel
+  const mensaje = `<a:love:1375278293921828904> Felicitaciones nakama ${message.author}, has avanzado a una nueva parte del Grand Line y ahora eres un pirata de nivel ${user.level}!<:LuffyWow:1375278276620058696>`;
   if (user.level > oldLevel) {
     await message.channel.send({
-      content: `:love: Felicitaciones nakama ${message.author}, has avanzado a una nueva parte del Grand Line y ahora eres un pirata de nivel ${user.level}! :LuffyWow:`
+      content: `${mensaje}`,
     });
   }
 }
