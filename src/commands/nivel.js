@@ -14,9 +14,11 @@ export const data = new SlashCommandBuilder()
   );
 
 export async function execute(interaction) {
+  let deferred = false;
   try {
     // Diferir la respuesta inmediatamente para evitar el timeout
     await interaction.deferReply();
+    deferred = true;
 
     // Permitir comandos de usuario solo en canal específico
     const allowedChannelId = '1269848036545134654';
@@ -132,17 +134,17 @@ export async function execute(interaction) {
     ctx.fillText(target.username, 360, 280); // Ajustada la posición
 
     // Rango y nivel (mucho más grandes)
-    ctx.font = 'bold 36px Sans-serif'; // Aumentado de 28px
+    ctx.font = 'bold 42px Sans-serif'; // Aumentado de 36px
     ctx.fillStyle = '#B0B0B0';
     ctx.fillText('RANGO', 800, 100);
-    ctx.font = 'bold 85px Sans-serif'; // Aumentado de 60px
+    ctx.font = 'bold 110px Sans-serif'; // Aumentado de 85px
     ctx.fillStyle = '#FFFFFF';
     ctx.fillText(`#${rank}`, 800, 180);
     
-    ctx.font = 'bold 36px Sans-serif'; // Aumentado de 28px
+    ctx.font = 'bold 42px Sans-serif'; // Aumentado de 36px
     ctx.fillStyle = '#3CB4E7';
     ctx.fillText('NIVEL', 1100, 100);
-    ctx.font = 'bold 85px Sans-serif'; // Aumentado de 60px
+    ctx.font = 'bold 110px Sans-serif'; // Aumentado de 85px
     ctx.fillStyle = '#3CB4E7';
     ctx.fillText(`${user.level}`, 1100, 180);
 
@@ -198,16 +200,16 @@ export async function execute(interaction) {
     });
   } catch (error) {
     console.error('Error en comando rank:', error);
-    if (!interaction.replied && !interaction.deferred) {
-      await interaction.reply({ 
-        content: 'Ocurrió un error al mostrar el nivel.', 
-        flags: 64 
-      });
-    } else {
-      await interaction.editReply({ 
-        content: 'Ocurrió un error al mostrar el nivel.', 
-        flags: 64 
-      });
+    const errorMessage = 'Ocurrió un error al mostrar el nivel.';
+    
+    try {
+      if (!deferred) {
+        await interaction.reply({ content: errorMessage, flags: 64 });
+      } else {
+        await interaction.editReply({ content: errorMessage, flags: 64 });
+      }
+    } catch (e) {
+      console.error('Error adicional al intentar responder:', e);
     }
   }
 }
