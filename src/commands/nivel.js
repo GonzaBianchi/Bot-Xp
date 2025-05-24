@@ -40,8 +40,8 @@ export async function execute(interaction) {
 
     // --- Generar la imagen tipo rank card estilo MEE6 ---
     // Configuración del canvas
-    const width = 1100;  // Aumentado de 934
-    const height = 340; // Aumentado de 282
+    const width = 1400;  // Aumentado de 1100
+    const height = 400; // Aumentado de 340
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
 
@@ -79,10 +79,10 @@ export async function execute(interaction) {
     ctx.fill();
 
     // Avatar más grande
-    const avatarSize = 220; // Aumentado de 180
-    const avatarX = 45;
+    const avatarSize = 280; // Aumentado de 220
+    const avatarX = 50;
     const avatarY = 60;
-    const avatarURL = target.displayAvatarURL({ extension: 'png', size: 256 });
+    const avatarURL = target.displayAvatarURL({ extension: 'png', size: 512 }); // Mayor calidad
     const avatar = await loadImage(avatarURL);
     ctx.save();
     ctx.beginPath();
@@ -116,41 +116,41 @@ export async function execute(interaction) {
     }
 
     // Círculo de estado (más grande)
-    const statusSize = 38; // Aumentado de 30
+    const statusSize = 48; // Aumentado de 38
     ctx.beginPath();
-    ctx.arc(avatarX + avatarSize - 30, avatarY + avatarSize - 30, statusSize, 0, Math.PI * 2, true);
+    ctx.arc(avatarX + avatarSize - 35, avatarY + avatarSize - 35, statusSize, 0, Math.PI * 2, true);
     ctx.fillStyle = statusColor;
     ctx.fill();
-    ctx.lineWidth = 8;
+    ctx.lineWidth = 10;
     ctx.strokeStyle = '#23272A';
     ctx.stroke();
 
-    // Nombre de usuario (más grande y más abajo)
-    ctx.font = '42px Sans-serif';
+    // Nombre de usuario (más grande)
+    ctx.font = '48px Sans-serif'; // Aumentado de 42px
     ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'left';
-    ctx.fillText(target.username, 290, 240); // Movido más abajo
+    ctx.fillText(target.username, 360, 280); // Ajustada la posición
 
-    // Rango y nivel (más grandes)
-    ctx.font = 'bold 28px Sans-serif';
+    // Rango y nivel (mucho más grandes)
+    ctx.font = 'bold 36px Sans-serif'; // Aumentado de 28px
     ctx.fillStyle = '#B0B0B0';
-    ctx.fillText('RANGO', 680, 90);
-    ctx.font = 'bold 60px Sans-serif';
+    ctx.fillText('RANGO', 800, 100);
+    ctx.font = 'bold 85px Sans-serif'; // Aumentado de 60px
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillText(`#${rank}`, 680, 150);
+    ctx.fillText(`#${rank}`, 800, 180);
     
-    ctx.font = 'bold 28px Sans-serif';
+    ctx.font = 'bold 36px Sans-serif'; // Aumentado de 28px
     ctx.fillStyle = '#3CB4E7';
-    ctx.fillText('NIVEL', 880, 90);
-    ctx.font = 'bold 60px Sans-serif';
+    ctx.fillText('NIVEL', 1100, 100);
+    ctx.font = 'bold 85px Sans-serif'; // Aumentado de 60px
     ctx.fillStyle = '#3CB4E7';
-    ctx.fillText(`${user.level}`, 880, 150);
+    ctx.fillText(`${user.level}`, 1100, 180);
 
     // Barra de experiencia más grande y estilizada
-    const barX = 290;
-    const barY = 260;
-    const barWidth = 760; // Más ancha
-    const barHeight = 40;  // Más alta
+    const barX = 360;
+    const barY = 300;
+    const barWidth = 990; // Más ancha (aumentado de 760)
+    const barHeight = 45;  // Más alta (aumentado de 40)
     const percent = Math.floor((user.xp / neededXp) * 100);
     
     // Fondo barra
@@ -180,14 +180,14 @@ export async function execute(interaction) {
     ctx.closePath();
     ctx.fill();
 
-    // XP texto (más grande y a la derecha)
-    ctx.font = '28px Sans-serif';
+    // XP texto (más grande)
+    ctx.font = '32px Sans-serif'; // Aumentado de 28px
     ctx.fillStyle = '#FFFFFF';
-    ctx.textAlign = 'right'; // Alineado a la derecha
+    ctx.textAlign = 'right';
     function formatXP(xp) {
       return xp >= 1000 ? (xp / 1000).toFixed(2).replace(/\.00$/, '') + 'K' : xp;
     }
-    ctx.fillText(`${formatXP(user.xp)} / ${formatXP(neededXp)} XP`, barX + barWidth - 10, barY - 10);
+    ctx.fillText(`${formatXP(user.xp)} / ${formatXP(neededXp)} XP`, barX + barWidth - 10, barY - 15);
 
     // Adjuntar imagen
     const buffer = canvas.toBuffer('image/png');
