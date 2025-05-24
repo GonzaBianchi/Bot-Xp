@@ -131,20 +131,18 @@ export async function execute(interaction) {
     ctx.font = '48px Sans-serif'; // Aumentado de 42px
     ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'left';
-    ctx.fillText(target.username, 360, 280); // Ajustada la posición
-
-    // Rango y nivel (mucho más grandes)
-    ctx.font = 'bold 42px Sans-serif'; // Aumentado de 36px
+    ctx.fillText(target.username, 360, 280); // Ajustada la posición    // Rango y nivel (mucho más grandes)
+    ctx.font = 'bold 42px Sans-serif';
     ctx.fillStyle = '#B0B0B0';
     ctx.fillText('RANGO', 800, 100);
-    ctx.font = 'bold 110px Sans-serif'; // Aumentado de 85px
+    ctx.font = 'bold 95px Sans-serif'; // Reducido de 110px
     ctx.fillStyle = '#FFFFFF';
     ctx.fillText(`#${rank}`, 800, 180);
     
-    ctx.font = 'bold 42px Sans-serif'; // Aumentado de 36px
+    ctx.font = 'bold 42px Sans-serif';
     ctx.fillStyle = '#3CB4E7';
     ctx.fillText('NIVEL', 1100, 100);
-    ctx.font = 'bold 110px Sans-serif'; // Aumentado de 85px
+    ctx.font = 'bold 95px Sans-serif'; // Reducido de 110px
     ctx.fillStyle = '#3CB4E7';
     ctx.fillText(`${user.level}`, 1100, 180);
 
