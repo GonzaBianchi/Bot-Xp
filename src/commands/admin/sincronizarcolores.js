@@ -3,7 +3,7 @@ import { assignColorRoles } from '../../utils/roleManager.js';
 
 export const data = new SlashCommandBuilder()
     .setName('sincronizarolesmiembros')
-    .setDescription('Asigna automáticamente todos los roles de secciones (con decoradores) a cada usuario actual del servidor')
+    .setDescription('Asigna todos los roles decorativos a cada usuario actual del servidor')
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator);
 
 export async function execute(interaction) {
