@@ -13,7 +13,7 @@ LevelRoleSchema.index({ guildId: 1, minLevel: 1 }, { unique: true, partialFilter
 export const LevelRole = mongoose.models.LevelRole || mongoose.model('LevelRole', LevelRoleSchema);
 
 export const data = new SlashCommandBuilder()
-  .setName('sincronizaroles')
+  .setName('sincronizarolesniveles')
   .setDescription('Sincroniza los roles de nivel del servidor (solo administradores)')
   .setDefaultMemberPermissions(PermissionFlagsBits.Administrator);
 

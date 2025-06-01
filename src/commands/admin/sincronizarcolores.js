@@ -2,8 +2,8 @@ import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { assignColorRoles } from '../../utils/roleManager.js';
 
 export const data = new SlashCommandBuilder()
-    .setName('sincronizarcolores')
-    .setDescription('Asigna los roles de colores a todos los miembros')
+    .setName('sincronizarolesmiembros')
+    .setDescription('Asigna automáticamente todos los roles de secciones (con decoradores) a cada usuario actual del servidor')
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator);
 
 export async function execute(interaction) {
@@ -41,7 +41,7 @@ export async function execute(interaction) {
             `${errorCount > 0 ? `❌ ${errorCount} errores encontrados\n` : ''}`
         );
     } catch (error) {
-        console.error('Error en comando sincronizarcolores:', error);
+        console.error('Error en comando sincronizaroles:', error);
         await interaction.editReply('❌ Ocurrió un error durante la sincronización de roles.');
     }
 }
