@@ -93,3 +93,45 @@ export async function updateMemberRoles(member, level) {
     };
   }
 }
+
+/**
+ * Asigna los roles decorativos a un miembro (roles con patrón especial)
+ * @param {GuildMember} member - El miembro al que asignar los roles
+ */
+export async function assignColorRoles(member) {
+    try {
+        // Patrón que busca cualquier texto entre los decoradores
+        const rolePattern = /✧･ﾟ: \*✧･ﾟ:\* 　(.+?)　 \*:･ﾟ✧\*:･ﾟ✧/;
+        const guild = member.guild;
+
+        // Verificar si el miembro es un bot y tiene el rol "Bots"
+        const isBot = member.user.bot && member.roles.cache.some(role => role.name === 'Bots');
+        if (isBot) {
+            console.log(`Saltando asignación de roles para bot: ${member.user.tag}`);
+            return;
+        }
+        
+        // Obtener todos los roles que coinciden con el patrón
+        const decorativeRoles = guild.roles.cache.filter(role => 
+            rolePattern.test(role.name)
+        );
+
+        if (decorativeRoles.size > 0) {
+            // Filtrar roles que el miembro ya tiene para no reasignarlos innecesariamente
+            const rolesToAdd = decorativeRoles.filter(role => !member.roles.cache.has(role.id));
+            
+            if (rolesToAdd.size > 0) {
+                await member.roles.add(rolesToAdd.map(role => role.id));
+                console.log(`Roles asignados a ${member.user.tag}: ${rolesToAdd.map(r => r.name).join(', ')}`);
+                return rolesToAdd.size; // Retornar cantidad de roles agregados
+            } else {
+                console.log(`${member.user.tag} ya tiene todos los roles decorativos`);
+                return 0;
+            }
+        }
+        return 0;
+    } catch (error) {
+        console.error(`Error asignando roles a ${member.user.tag}:`, error);
+        throw error;
+    }
+}
