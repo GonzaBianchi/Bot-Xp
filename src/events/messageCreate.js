@@ -51,8 +51,18 @@ export default async function(message) {
     let isReplyToBot = false;
     if (message.reference) {
       try {
-        const refMsg = await message.fetchReference();
+        let refMsg = await message.fetchReference();
+        // Si el mensaje referenciado es del bot, o si es respuesta a una respuesta del bot
         isReplyToBot = refMsg.author?.id === botId;
+        // Si el mensaje referenciado es una respuesta a otro mensaje, buscar recursivamente
+        let depth = 0;
+        while (!isReplyToBot && refMsg.reference && depth < 2) { // máximo 2 niveles para evitar loops
+          try {
+            refMsg = await refMsg.fetchReference();
+            isReplyToBot = refMsg.author?.id === botId;
+            depth++;
+          } catch { break; }
+        }
       } catch {}
     }
     if (isMention || isReplyToBot) {
@@ -65,8 +75,16 @@ export default async function(message) {
         await message.reply('¿Eh? ¿Qué es eso? ¡No entiendo esa tecnología! Shishishi~');
         return;
       }
+      // Limpiar emojis del mensaje
+      let cleanContent = message.content
+        // Quitar emojis custom de Discord
+        .replace(/<a?:\w+:\d+>/g, '')
+        // Quitar emojis Unicode
+        .replace(/[\p{Emoji}\u200d]+/gu, '')
+        .replace(/\s+/g, ' ') // Espacios extra
+        .trim();
       // Prompt personalizado para Gemini
-      const prompt = `Responde como Monkey D. Luffy de One Piece. Eres alegre, directo, a veces ingenuo, pero siempre valiente y con espíritu de aventura. Responde de manera coherente, pero manteniendo tu estilo único de Luffy. Si te preguntan algo, contesta como lo haría Luffy, usando expresiones y personalidad propias del personaje. Mensaje del usuario: "${message.content.replace(`<@${botId}>`, '').trim()}"`;
+      const prompt = `Responde como Monkey D. Luffy de One Piece. Eres alegre, directo, a veces ingenuo, pero siempre valiente y con espíritu de aventura. Responde de manera coherente, pero manteniendo tu estilo único de Luffy. Si te preguntan algo, contesta como lo haría Luffy, usando expresiones y personalidad propias del personaje. Mensaje del usuario: "${cleanContent.replace(`<@${botId}>`, '').trim()}"`;
       // --- Context Cache Gemini ---
       let contextCacheDoc = await GeminiContextCache.findOne({ channelId: message.channel.id });
       let contextCacheId = contextCacheDoc?.contextCacheId;
