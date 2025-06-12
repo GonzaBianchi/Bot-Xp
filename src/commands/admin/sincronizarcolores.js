@@ -33,7 +33,8 @@ export async function execute(interaction) {
                 console.error(`Error asignando roles a ${member.user.tag}:`, error);
                 errorCount++;
             }
-        }        await interaction.editReply(
+        }        // Mensaje final usando followUp para evitar error de token inválido
+        await interaction.followUp(
             `Sincronización completada:\n` +
             `✅ ${membersUpdated} miembros actualizados\n` +
             `📊 ${totalRolesAdded} roles agregados en total\n` +
@@ -42,6 +43,6 @@ export async function execute(interaction) {
         );
     } catch (error) {
         console.error('Error en comando sincronizaroles:', error);
-        await interaction.editReply('❌ Ocurrió un error durante la sincronización de roles.');
+        await interaction.followUp('❌ Ocurrió un error durante la sincronización de roles.');
     }
 }
