@@ -116,32 +116,31 @@ export async function assignColorRoles(member) {
             rolePattern.test(role.name)
         );
 
-        // Además, buscar el rol especial de Lolcito y agregarlo si no lo tiene
-        const lolcitoRole = guild.roles.cache.find(role => role.name === '──────『𝓛𝓸𝓵𝓬𝓲𝓽𝓸』──────');
-        let lolcitoAdded = 0;
-        if (lolcitoRole && !member.roles.cache.has(lolcitoRole.id)) {
-            await member.roles.add(lolcitoRole.id);
-            lolcitoAdded = 1;
-            console.log(`Rol especial de Lolcito asignado a ${member.user.tag}`);
+        // Además, buscar el rol especial de Bandidos y agregarlo si no lo tiene
+        const bandidosRole = guild.roles.cache.find(role => role.name === '──────『𝐵𝒶𝓃𝒹𝒾𝒹𝑜𝓈』──────');
+        let bandidosAdded = 0;
+        if (bandidosRole && !member.roles.cache.has(bandidosRole.id)) {
+            await member.roles.add(bandidosRole.id);
+            bandidosAdded = 1;
+            console.log(`Rol especial de Bandidos asignado a ${member.user.tag}`);
         }
 
         if (decorativeRoles.size > 0) {
             // Filtrar roles que el miembro ya tiene para no reasignarlos innecesariamente
             const rolesToAdd = decorativeRoles.filter(role => !member.roles.cache.has(role.id));
-            
-            let totalAdded = lolcitoAdded;
+            let totalAdded = bandidosAdded;
             if (rolesToAdd.size > 0) {
                 await member.roles.add(rolesToAdd.map(role => role.id));
                 console.log(`Roles asignados a ${member.user.tag}: ${rolesToAdd.map(r => r.name).join(', ')}`);
                 totalAdded += rolesToAdd.size;
                 return totalAdded; // Retornar cantidad de roles agregados
             } else {
-                if (lolcitoAdded > 0) return lolcitoAdded;
-                console.log(`${member.user.tag} ya tiene todos los roles decorativos y el de Lolcito`);
+                if (bandidosAdded > 0) return bandidosAdded;
+                console.log(`${member.user.tag} ya tiene todos los roles decorativos y el de Bandidos`);
                 return 0;
             }
         }
-        return lolcitoAdded;
+        return bandidosAdded;
     } catch (error) {
         console.error(`Error asignando roles a ${member.user.tag}:`, error);
         throw error;
